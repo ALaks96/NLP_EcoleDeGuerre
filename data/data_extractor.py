@@ -6,6 +6,7 @@ import string
 import unidecode
 from pptx import Presentation
 from ftfy import fix_encoding
+from langdetect import detect
 
 try:
     from xml.etree.cElementTree import XML
@@ -171,6 +172,7 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = ppt_extractor(path)
+            texts["language"] = detect(ppt_extractor(path))
             index += 1
             mega_dic[str(index)] = texts
             print(index)
@@ -182,6 +184,7 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = pdf_extractor(path)
+            texts["language"] = detect(pdf_extractor(path))
             mega_dic[str(index)] = texts
             index += 1
             print(index)
@@ -193,6 +196,7 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = docx_extractor(path)
+            texts["language"] = detect(docx_extractor(path))
             index += 1
             mega_dic[str(index)] = texts
             print(index)
@@ -203,7 +207,8 @@ def extract_text(location):
             print("----------------------")
 
             texts["title"] = filename
-            texts["data"] = docx_extractor(path)
+            texts["data"] = txt_extractor(path)
+            texts["language"] = detect(txt_extractor(path))
             index += 1
             mega_dic[str(index)] = texts
             print(index)
