@@ -3,6 +3,7 @@ import os
 import PyPDF2
 import textract
 import string
+import unidecode
 from pptx import Presentation
 from ftfy import fix_encoding
 
@@ -78,6 +79,7 @@ def fix_text(text):
     text = text.rstrip("\n")
     text = text.rstrip("\t")
     text = fix_encoding(text)
+    text = unidecode.unidecode(text)
     text = correct_ascii(text)
 
     return text
