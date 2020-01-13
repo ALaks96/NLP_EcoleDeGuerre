@@ -6,7 +6,6 @@ import string
 import unidecode
 from pptx import Presentation
 from ftfy import fix_encoding
-from langdetect import detect
 
 try:
     from xml.etree.cElementTree import XML
@@ -28,6 +27,27 @@ def get_arbo(location):
         paths.append(path)
 
     return paths
+
+
+def correct_ascii(text):
+    printable = set(string.printable)
+    text = ''.join(filter(lambda x: x in printable, text))
+
+    return text
+
+
+def fix_text(text):
+    text = text.replace("\n", " ")
+    text = text.replace("\t", " ")
+    text = text.replace("\u2013", "-")
+    text = text.replace("\u03d5", "ϕ")
+    text = text.rstrip("\n")
+    text = text.rstrip("\t")
+    text = fix_encoding(text)
+    text = unidecode.unidecode(text)
+    text = correct_ascii(text)
+
+    return text
 
 
 def pdf_extractor(path):
@@ -64,26 +84,6 @@ def pdf_extractor(path):
                                                                              encoding='utf-8'))
 
     return paragraph_repo
-
-
-def correct_ascii(text):
-    printable = set(string.printable)
-
-    return filter(lambda x: x in printable, text)
-
-
-def fix_text(text):
-    text = text.replace("\n", " ")
-    text = text.replace("\t", " ")
-    text = text.replace("\u2013", "-")
-    text = text.replace("\u03d5","ϕ")
-    text = text.rstrip("\n")
-    text = text.rstrip("\t")
-    text = fix_encoding(text)
-    text = unidecode.unidecode(text)
-    text = correct_ascii(text)
-
-    return text
 
 
 def docx_extractor(path):
@@ -172,7 +172,6 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = ppt_extractor(path)
-            texts["language"] = detect(ppt_extractor(path))
             index += 1
             mega_dic[str(index)] = texts
             print(index)
@@ -184,7 +183,6 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = pdf_extractor(path)
-            texts["language"] = detect(pdf_extractor(path))
             mega_dic[str(index)] = texts
             index += 1
             print(index)
@@ -196,7 +194,6 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = docx_extractor(path)
-            texts["language"] = detect(docx_extractor(path))
             index += 1
             mega_dic[str(index)] = texts
             print(index)
@@ -208,7 +205,6 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = txt_extractor(path)
-            texts["language"] = detect(txt_extractor(path))
             index += 1
             mega_dic[str(index)] = texts
             print(index)
