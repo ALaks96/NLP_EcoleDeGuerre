@@ -2,6 +2,7 @@ import json
 import os
 import PyPDF2
 import textract
+import string
 from pptx import Presentation
 from ftfy import fix_encoding
 
@@ -63,6 +64,12 @@ def pdf_extractor(path):
     return paragraph_repo
 
 
+def correct_ascii(text):
+    printable = set(string.printable)
+
+    return filter(lambda x: x in printable, text)
+
+
 def fix_text(text):
     text = text.replace("\n", " ")
     text = text.replace("\t", " ")
@@ -71,6 +78,7 @@ def fix_text(text):
     text = text.rstrip("\n")
     text = text.rstrip("\t")
     text = fix_encoding(text)
+    text = correct_ascii(text)
 
     return text
 
