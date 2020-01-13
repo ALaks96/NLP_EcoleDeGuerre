@@ -199,4 +199,6 @@ def extract_text(location):
             print(index)
             texts = {}
 
-    return to_json(mega_dic)
+    to_json(mega_dic)
+
+    return mega_dic
