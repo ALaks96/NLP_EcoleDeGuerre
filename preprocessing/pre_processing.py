@@ -1,8 +1,10 @@
+import string
+import unidecode
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
-from sklearn.model_selection import train_test_split
+from ftfy import fix_encoding
 
 
 def requirements():
@@ -43,7 +45,34 @@ def clean_text(text):
     return text
 
 
-def launch_preprocessing(text):
+def correct_ascii(text):
+    printable = set(string.printable)
+    text = ''.join(filter(lambda x: x in printable, text))
+
+    return text
+
+
+def fix_text(text):
+    text = text.replace("\n", " ")
+    text = text.replace("\t", " ")
+    text = text.replace("\u2013", "-")
+    text = text.replace("\u03d5", "ϕ")
+    text = text.rstrip("\n")
+    text = text.rstrip("\t")
+    text = fix_encoding(text)
+    text = unidecode.unidecode(text)
+    text = correct_ascii(text)
+
+    return text
+
+
+def concat_str_list(l):
+    s = ' '.join(l)
+
+    return s
+
+
+def preprocessing(text):
 
     stopword_list, lemmatizer, transformation_sc_dict = requirements()
 
@@ -66,20 +95,4 @@ def launch_preprocessing(text):
     # Final cleaning of additionnal characters
     tokens = [clean_text(token) for token in tokens]
 
-    return tokens
-
-
-def train_test(df, training, labels, split=0.2):
-
-    x = df[str(training)]
-    y = df[str(labels)]
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=111)
-
-    return x_train, x_test, y_train, y_test
-
-
-def concat_str_list(l):
-    s = ' '.join(l)
-
-    return s
-
+    return concat_str_list(tokens)

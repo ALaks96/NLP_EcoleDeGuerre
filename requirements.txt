@@ -1,3 +1,4 @@
+graphviz
 unidecode
 langdetect
 argcomplete==1.10.0

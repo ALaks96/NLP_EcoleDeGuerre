@@ -1,14 +1,11 @@
-import json
-import os
 import PyPDF2
 import textract
-import string
-import unidecode
+import os
 from pptx import Presentation
-from ftfy import fix_encoding
 from PIL import Image
 from PIL.ExifTags import TAGS
-
+from preprocessing.pre_processing import fix_text
+import lxml.etree
 try:
     from xml.etree.cElementTree import XML
 except ImportError:
@@ -18,38 +15,6 @@ import zipfile
 WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
 PARA = WORD_NAMESPACE + 'p'
 TEXT = WORD_NAMESPACE + 't'
-
-
-def get_arbo(location):
-    # Initialize list of directories
-    paths = []
-
-    for file in os.listdir(location):
-        path = str(location) + "/" + str(file)
-        paths.append(path)
-
-    return paths
-
-
-def correct_ascii(text):
-    printable = set(string.printable)
-    text = ''.join(filter(lambda x: x in printable, text))
-
-    return text
-
-
-def fix_text(text):
-    text = text.replace("\n", " ")
-    text = text.replace("\t", " ")
-    text = text.replace("\u2013", "-")
-    text = text.replace("\u03d5", "ϕ")
-    text = text.rstrip("\n")
-    text = text.rstrip("\t")
-    text = fix_encoding(text)
-    text = unidecode.unidecode(text)
-    text = correct_ascii(text)
-
-    return text
 
 
 def pdf_extractor(path):
@@ -62,6 +27,8 @@ def pdf_extractor(path):
     # Get total pdf page number.
     total_page_number = pdf_file_reader.numPages
 
+    creator = pdf_file_reader.getDocumentInfo()["/Author"]
+
     # Print pdf total page number.
     print('This pdf file contains totally ' + str(total_page_number) + ' pages.')
 
@@ -70,6 +37,7 @@ def pdf_extractor(path):
 
     # Loop in all the pdf pages.
     while current_page_number < total_page_number:
+        pdf_page = None
         # Get the specified pdf page object.
         pdf_page = pdf_file_reader.getPage(current_page_number)
 
@@ -85,18 +53,26 @@ def pdf_extractor(path):
                                                                              method='tesseract',
                                                                              encoding='utf-8'))
 
-    return paragraph_repo
+    return creator, paragraph_repo
 
 
 def docx_extractor(path):
     document = zipfile.ZipFile(path)
     xml_content = document.read('word/document.xml')
+    ## GET METADATA
+    # use lxml to parse the xml file we are interested in
+    doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
+    # retrieve creator
+    ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
+    creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
     document.close()
     tree = XML(xml_content)
 
     doc = {}
     paragraph_nb = 1
     for paragraph in tree.getiterator(PARA):
+        texts = None
+        text = ""
         texts = [node.text
                  for node in paragraph.getiterator(TEXT)
                  if node.text]
@@ -105,20 +81,30 @@ def docx_extractor(path):
             doc[str(paragraph_nb)] = fix_text(text)
             paragraph_nb += 1
 
-    return doc
+    return creator, doc
 
 
 def ppt_extractor(path):
+    filename = os.path.basename(path)
     paragraph_repo = {}
     f = open(path, "rb")
     prs = Presentation(f)
-
     slide_nb = 0
-    temp_text = ''
+    if filename.endswith(".pptx"):
+        document = zipfile.ZipFile(path)
+        ## GET METADATA
+        # use lxml to parse the xml file we are interested in
+        doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
+        # retrieve creator
+        ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
+        creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+    else:
+        creator = "Unknown"
 
     for slide in prs.slides:
 
         slide_nb += 1
+        temp_text = ''
 
         for shape in slide.shapes:
 
@@ -127,7 +113,7 @@ def ppt_extractor(path):
 
         paragraph_repo[str(slide_nb)] = fix_text(temp_text)
 
-    return paragraph_repo
+    return creator, paragraph_repo
 
 
 def txt_extractor(path):
@@ -157,84 +143,12 @@ def img_extractor(path):
     return ret
 
 
-def to_json(dic):
-    js = json.dumps(dic)
+def get_arbo(location):
+    # Initialize list of directories
+    paths = []
 
-    # Open new json file if not exist it will create
-    fp = open(os.getcwd() + '/data/data/extracted_texts.json', 'a')
+    for file in os.listdir(location):
+        path = str(location) + "/" + str(file)
+        paths.append(path)
 
-    # write to json file
-    fp.write(js)
-
-    # close the connection
-    fp.close()
-
-
-def extract_text(location):
-    paths = get_arbo(location)
-    texts = {}
-    index = 0
-    mega_dic = {}
-
-    for path in paths:
-
-        filename = os.path.basename(path)
-
-        if path.endswith(".pptx") or path.endswith(".ppt"):
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["data"] = ppt_extractor(path)
-            index += 1
-            mega_dic[str(index)] = texts
-            print(index)
-            texts = {}
-
-        if path.endswith(".pdf"):
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["data"] = pdf_extractor(path)
-            mega_dic[str(index)] = texts
-            index += 1
-            print(index)
-            texts = {}
-
-        if path.endswith(".docx"):
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["data"] = docx_extractor(path)
-            index += 1
-            mega_dic[str(index)] = texts
-            print(index)
-            texts = {}
-
-        if path.endswith(".txt"):
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["data"] = txt_extractor(path)
-            index += 1
-            mega_dic[str(index)] = texts
-            print(index)
-            texts = {}
-
-        if path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["data"] = img_extractor(path)
-            index += 1
-            mega_dic[str(index)] = texts
-            print(index)
-            texts = {}
-
-    to_json(mega_dic)
-
-    return mega_dic
+    return paths
