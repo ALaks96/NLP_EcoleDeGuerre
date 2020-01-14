@@ -5,6 +5,7 @@ from visualization.tree_graph import render_tree
 from connectdb import upload_to_es
 
 location = os.getcwd() + "/data/data"
-render_tree(location)
+#render_tree(location)
 texts = extract_text(location)
-texts_nlp = launch_preprocessing(texts)
+#texts_nlp = launch_preprocessing(texts)
+upload_to_es(texts, 'nlp', 'localhost', 9200)
