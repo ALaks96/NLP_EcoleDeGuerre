@@ -6,6 +6,8 @@ import string
 import unidecode
 from pptx import Presentation
 from ftfy import fix_encoding
+from PIL import Image
+from PIL.ExifTags import TAGS
 
 try:
     from xml.etree.cElementTree import XML
@@ -143,6 +145,18 @@ def txt_extractor(path):
     return doc
 
 
+def img_extractor(path):
+    ret = {}
+    i = Image.open(path)
+    info = i._getexif()
+
+    for tag, value in info.items():
+        decoded = TAGS.get(tag, tag)
+        ret[decoded] = value
+
+    return ret
+
+
 def to_json(dic):
     js = json.dumps(dic)
 
@@ -205,6 +219,17 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["data"] = txt_extractor(path)
+            index += 1
+            mega_dic[str(index)] = texts
+            print(index)
+            texts = {}
+
+        if path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
+            print(filename)
+            print("----------------------")
+
+            texts["title"] = filename
+            texts["data"] = img_extractor(path)
             index += 1
             mega_dic[str(index)] = texts
             print(index)
