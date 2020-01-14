@@ -8,4 +8,4 @@ location = os.getcwd() + "/data/data"
 #render_tree(location)
 texts = extract_text(location)
 #texts_nlp = launch_preprocessing(texts)
-upload_to_es(texts, 'nlp', 'localhost', 9200)
+#upload_to_es(texts, 'nlp', 'localhost', 9200)
