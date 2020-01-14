@@ -26,8 +26,10 @@ def pdf_extractor(path):
 
     # Get total pdf page number.
     total_page_number = pdf_file_reader.numPages
-
-    creator = pdf_file_reader.getDocumentInfo()["/Author"]
+    try:
+        creator = pdf_file_reader.getDocumentInfo()["/Author"]
+    except:
+        creator = "Unknown"
 
     # Print pdf total page number.
     print('This pdf file contains totally ' + str(total_page_number) + ' pages.')
