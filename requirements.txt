@@ -7,8 +7,10 @@ certifi==2019.11.28
 chardet==3.0.4
 docx2txt==0.8
 EbookLib==0.17.1
+elasticsearch
 extract-msg==0.23.1
 ftfy==5.6
+hachoir
 idna==2.8
 IMAPClient==2.1.0
 joblib==0.14.1

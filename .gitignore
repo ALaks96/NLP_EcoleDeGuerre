@@ -6,3 +6,4 @@
 *.pptx
 /data/data
 .DS_Store
+*.pyc
