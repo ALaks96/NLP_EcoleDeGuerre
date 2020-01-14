@@ -2,8 +2,8 @@ import PyPDF2
 import textract
 import os
 from pptx import Presentation
-from PIL import Image
-from PIL.ExifTags import TAGS
+from hachoir.parser import createParser
+from hachoir.metadata import extractMetadata
 from preprocessing.pre_processing import fix_text
 import lxml.etree
 try:
@@ -61,10 +61,13 @@ def docx_extractor(path):
     xml_content = document.read('word/document.xml')
     ## GET METADATA
     # use lxml to parse the xml file we are interested in
-    doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
+    try:
+        doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
     # retrieve creator
-    ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
-    creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+        ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
+        creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+    except:
+        creator = "Unknown"
     document.close()
     tree = XML(xml_content)
 
@@ -91,13 +94,16 @@ def ppt_extractor(path):
     prs = Presentation(f)
     slide_nb = 0
     if filename.endswith(".pptx"):
-        document = zipfile.ZipFile(path)
+        try:
+            document = zipfile.ZipFile(path)
         ## GET METADATA
         # use lxml to parse the xml file we are interested in
-        doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
+            doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
         # retrieve creator
-        ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
-        creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+            ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
+            creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+        except:
+            creator = "Unknown"
     else:
         creator = "Unknown"
 
@@ -132,15 +138,10 @@ def txt_extractor(path):
 
 
 def img_extractor(path):
-    ret = {}
-    i = Image.open(path)
-    info = i._getexif()
+    parser = createParser(path)
+    metadata = extractMetadata(parser)
 
-    for tag, value in info.items():
-        decoded = TAGS.get(tag, tag)
-        ret[decoded] = value
-
-    return ret
+    return metadata.exportDictionary()["Metadata"]
 
 
 def get_arbo(location):

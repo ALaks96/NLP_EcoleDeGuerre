@@ -10,8 +10,7 @@ from preprocessing.pre_processing import preprocessing
 
 
 def to_json(dic, file_name="extracted_texts.json"):
-
-    js = json.dumps(dic)
+    js = json.dumps(dic, indent=1)
 
     # Open new json file if not exist it will create
     fp = open(os.getcwd() + '/data/data/' + str(file_name), 'a')
@@ -85,7 +84,7 @@ def extract_text(location):
             mega_dic[str(index)] = texts
             texts = {}
 
-        if path.endswith(".png") or path.endswith(".jpg"):
+        if path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
             print(index)
             print(filename)
             print("----------------------")
