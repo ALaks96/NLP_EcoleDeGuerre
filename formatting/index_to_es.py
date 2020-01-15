@@ -5,8 +5,18 @@ from data.data_extractor import ppt_extractor, pdf_extractor, pdf_extractor2, pd
 #Initialise la connexion a ES avec les paremetres par defaut => localhost:9200
 es = Elasticsearch()
 
+def get_paths():
+    l = []
+    with open(os.getcwd() + '/scan.json') as json_file:
+        data = json.load(json_file)
+    for p in data:
+        if(p['type'] == 'pdf'):
+            l.append(p['filepath'])
+    return l
+
 def index_doc(location, save=False):
-    paths = get_arbo(location)
+    #paths = get_arbo(location)
+    paths = get_paths()
     new_doc = {}
 
     for path in paths:
@@ -42,6 +52,6 @@ def index_doc(location, save=False):
 def to_json(dic, file_name="extracted_texts.json"):
     js = json.dumps(dic, indent=1)
     # Open with append option 'a'
-    fp = open(os.getcwd() + '/data/data/' + str(file_name), 'a')
+    fp = open(os.getcwd() + '/data' + str(file_name), 'a')
     fp.write(js)
     fp.close()
