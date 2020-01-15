@@ -12,14 +12,14 @@ def requirements():
     try:
         stopword_list = stopwords.words('english')
 
-    except OSError:
+    except:
         nltk.download('stopwords')
         stopword_list = stopwords.words('english')
 
     try:
         lemmatizer = WordNetLemmatizer()
 
-    except OSError:
+    except:
         nltk.download('wordnet')
         lemmatizer = WordNetLemmatizer()
 
@@ -77,20 +77,29 @@ def preprocessing(text):
     stopword_list, lemmatizer, transformation_sc_dict = requirements()
 
     # Tokenization
-    tokens = word_tokenize(text)
+    try:
+        tokens = word_tokenize(text)
+    except:
+        nltk.download('punkt')
+        tokens = word_tokenize(text)
 
-    # Deleting words with  only one caracter
-    tokens = [token for token in tokens if len(token) > 2]
+    # # Deleting words with  only one caracter
+    # tokens = [token for token in tokens if len(token) > 2]
 
-    # stopwords + lowercase
-    tokens = [token.lower() for token in tokens if token.lower() not in stopword_list]
+    # # stopwords + lowercase
+    # tokens = [token.lower() for token in tokens if token.lower() not in stopword_list]
 
-    # Deleting specific characters
-    tokens = [token.translate(str.maketrans(transformation_sc_dict)) for token in tokens]
+    # # Deleting specific characters
+    # tokens = [token.translate(str.maketrans(transformation_sc_dict)) for token in tokens]
 
-    # Lemmatizing tokens
-    tokens = [lemmatizer.lemmatize(lemmatizer.lemmatize(lemmatizer.lemmatize(token, pos='a'), pos='v'), pos='n') for
-              token in tokens]
+    # # Lemmatizing tokens
+    # try:
+    #     tokens = [lemmatizer.lemmatize(lemmatizer.lemmatize(lemmatizer.lemmatize(token, pos='a'), pos='v'), pos='n') for
+    #           token in tokens]
+    # except:
+    #     nltk.download('wordnet')
+    #     tokens = [lemmatizer.lemmatize(lemmatizer.lemmatize(lemmatizer.lemmatize(token, pos='a'), pos='v'), pos='n') for
+    #           token in tokens]
 
     # Final cleaning of additionnal characters
     tokens = [clean_text(token) for token in tokens]

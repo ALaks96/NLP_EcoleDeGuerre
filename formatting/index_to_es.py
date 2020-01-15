@@ -1,7 +1,7 @@
 import os
 from elasticsearch import Elasticsearch
-from data.data_extractor import ppt_extractor, pdf_extractor, txt_extractor, docx_extractor, img_extractor, get_arbo
-from formatting.contruct_database import to_json
+from data.data_extractor import ppt_extractor, pdf_extractor, pdf_extractor2, txt_extractor, docx_extractor, img_extractor, get_arbo
+
 #Initialise la connexion a ES avec les paremetres par defaut => localhost:9200
 es = Elasticsearch()
 
@@ -31,8 +31,6 @@ def index_doc(location, save=False):
 
         if save:
             to_json(new_doc, "index.json")
-        else:
-            continue
 
         # Envoi du document sur Elastic Search
         res = es.index(index="test", body=new_doc)
@@ -40,3 +38,10 @@ def index_doc(location, save=False):
         new_doc = {}
 
     return True
+
+def to_json(dic, file_name="extracted_texts.json"):
+    js = json.dumps(dic, indent=1)
+    # Open with append option 'a'
+    fp = open(os.getcwd() + '/data/data/' + str(file_name), 'a')
+    fp.write(js)
+    fp.close()
