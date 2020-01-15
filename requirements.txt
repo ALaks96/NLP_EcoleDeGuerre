@@ -1,3 +1,5 @@
+slate3k
+hachoir
 graphviz
 unidecode
 langdetect
@@ -39,3 +41,4 @@ urllib3==1.25.7
 wcwidth==0.1.8
 xlrd==1.2.0
 XlsxWriter==1.2.7
+#pip install -e git+git://https://github.com/TakesxiSximada/slate3k

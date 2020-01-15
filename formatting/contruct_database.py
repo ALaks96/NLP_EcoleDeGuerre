@@ -40,7 +40,7 @@ def extract_text(location):
             texts["title"] = filename
             texts["filepath"] = path
             texts["isClassified"] = "No"
-            texts['author'], texts["data"] = ppt_extractor(path)
+            texts['author'], texts["data"], texts["preprocessed"] = ppt_extractor(path)
             index += 1
             mega_dic[str(index)] = texts
             texts = {}
@@ -52,8 +52,7 @@ def extract_text(location):
 
             texts["title"] = filename
             texts["filepath"] = path
-            texts["isClassified"] = "No"
-            texts["author"], texts["data"] = pdf_extractor(path)
+            texts["isClassified"], texts["author"], texts["data"], texts["preprocessed"] = pdf_extractor(path)
             mega_dic[str(index)] = texts
             index += 1
             texts = {}
@@ -66,7 +65,7 @@ def extract_text(location):
             texts["title"] = filename
             texts["filepath"] = path
             texts["isClassified"] = "No"
-            texts["author"], texts["data"] = docx_extractor(path)
+            texts["author"], texts["data"],texts["preprocessed"] = docx_extractor(path)
             index += 1
             mega_dic[str(index)] = texts
             texts = {}
@@ -79,7 +78,7 @@ def extract_text(location):
             texts["title"] = filename
             texts["filepath"] = path
             texts["isClassified"] = "No"
-            texts['author'], texts["data"] = "Unknown", txt_extractor(path)
+            texts['author'], texts["data"], texts["preprocessed"] = "Unknown", txt_extractor(path)
             index += 1
             mega_dic[str(index)] = texts
             texts = {}
@@ -92,7 +91,7 @@ def extract_text(location):
             texts["title"] = filename
             texts["filepath"] = path
             texts["isClassified"] = "No"
-            texts['author'], texts["data"] = "Unknown", img_extractor(path)
+            texts['author'], texts["data"], texts["preprocessed"] = "Unknown", img_extractor(path), None
             index += 1
             mega_dic[str(index)] = texts
             texts = {}
