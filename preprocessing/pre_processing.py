@@ -102,6 +102,6 @@ def preprocessing(text):
     #           token in tokens]
 
     # Final cleaning of additionnal characters
-    tokens = [clean_text(token) for token in tokens]
+    tokens = [fix_text(clean_text(token)) for token in tokens]
 
     return concat_str_list(tokens)
