@@ -1,6 +1,6 @@
-import os
+import os, json
 from elasticsearch import Elasticsearch
-from data.data_extractor import ppt_extractor, pdf_extractor, pdf_extractor2, txt_extractor, docx_extractor, img_extractor, get_arbo
+from data.data_extractor import ppt_extractor, pdf_extractor, pdf_extractor2, pdf_extractor3, txt_extractor, docx_extractor, img_extractor, get_arbo
 
 #Initialise la connexion a ES avec les paremetres par defaut => localhost:9200
 es = Elasticsearch()
@@ -17,15 +17,15 @@ def index_doc(location, save=False):
         new_doc["filepath"] = path
         new_doc["isClassified"] = "No"
         if path.endswith(".pptx") or path.endswith(".ppt"):
-            new_doc["author"], new_doc["data"], new_doc["preprocessed"] = ppt_extractor(path)
+            new_doc["author"], new_doc["data"] = ppt_extractor(path)
         elif path.endswith(".pdf"):
-            new_doc["isClassified"], new_doc["author"], new_doc["data"], new_doc["preprocessed"] = pdf_extractor(path)
+            new_doc["isClassified"], new_doc["author"], new_doc["data"] = pdf_extractor3(path)
         elif path.endswith(".docx"):
-            new_doc["author"], new_doc["data"], new_doc["preprocessed"] = docx_extractor(path)
+            new_doc["author"], new_doc["data"] = docx_extractor(path)
         elif path.endswith(".docx"):
-            new_doc["author"], new_doc["data"], new_doc["preprocessed"] = txt_extractor(path)
+            new_doc["author"], new_doc["data"] = txt_extractor(path)
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
-            new_doc["author"], new_doc["data"], new_doc["preprocessed"] = "Image", img_extractor(path), None
+            new_doc["author"], new_doc["data"] = "Image", img_extractor(path), None
         else:
             continue
 

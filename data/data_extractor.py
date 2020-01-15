@@ -228,7 +228,7 @@ def pdf_extractor3(path):
     retstr = StringIO()
     codec = 'utf-8'
     laparams = LAParams()
-    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+    device = TextConverter(rsrcmgr, retstr, laparams=laparams)
     fp = open(path, 'rb')
     interpreter = PDFPageInterpreter(rsrcmgr, device)
     password = ""
@@ -242,8 +242,8 @@ def pdf_extractor3(path):
     #clean_paragraph_repo = {}
     Classified = "No"
 
-    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
-                                  check_extractable=True):
+    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
+        text = ''
         interpreter.process_page(page)
 
         text = retstr.getvalue()
