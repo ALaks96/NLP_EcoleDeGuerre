@@ -13,7 +13,7 @@ def to_json(dic, file_name="extracted_texts.json"):
     js = json.dumps(dic, indent=1)
 
     # Open new json file if not exist it will create
-    fp = open(os.getcwd() + '/data/data/' + str(file_name), 'a')
+    fp = open(os.getcwd() + '/data/data/' + str(file_name), 'w')
 
     # write to json file
     fp.write(js)
@@ -24,77 +24,49 @@ def to_json(dic, file_name="extracted_texts.json"):
 
 def extract_text(location):
     paths = get_arbo(location)
-    texts = {}
     index = 0
     mega_dic = {}
 
     for path in paths:
-
+        new_doc = {}
         filename = os.path.basename(path)
-
+        print(filename)
+        new_doc["title"] = filename
+        new_doc["filepath"] = path
+        new_doc["isClassified"] = "No"
+        new_doc['author'] = "Unknown"
         if path.endswith(".pptx") or path.endswith(".ppt"):
-            print(index)
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["filepath"] = path
-            texts["isClassified"] = "No"
-            texts['author'], texts["data"], texts["preprocessed"] = ppt_extractor(path)
+            new_doc['author'], \
+            new_doc["data"], \
+            new_doc["preprocessed"] = ppt_extractor(path)
             index += 1
-            mega_dic[str(index)] = texts
-            texts = {}
-
-        if path.endswith(".pdf"):
-            print(index)
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["filepath"] = path
-            texts["isClassified"], texts["author"], texts["data"], texts["preprocessed"] = pdf_extractor(path)
-            mega_dic[str(index)] = texts
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".pdf"):
+            new_doc["isClassified"], \
+            new_doc["author"], \
+            new_doc["data"], \
+            new_doc["preprocessed"] = pdf_extractor(path)
             index += 1
-            texts = {}
-
-        if path.endswith(".docx"):
-            print(index)
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["filepath"] = path
-            texts["isClassified"] = "No"
-            texts["author"], texts["data"],texts["preprocessed"] = docx_extractor(path)
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".docx"):
+            new_doc["author"], \
+            new_doc["data"], \
+            new_doc["preprocessed"] = docx_extractor(path)
             index += 1
-            mega_dic[str(index)] = texts
-            texts = {}
-
-        if path.endswith(".txt"):
-            print(index)
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["filepath"] = path
-            texts["isClassified"] = "No"
-            texts['author'], texts["data"], texts["preprocessed"] = "Unknown", txt_extractor(path)
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".docx"):
+            new_doc["author"], \
+            new_doc["data"], \
+            new_doc["preprocessed"] = txt_extractor(path)
             index += 1
-            mega_dic[str(index)] = texts
-            texts = {}
-
-        if path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
-            print(index)
-            print(filename)
-            print("----------------------")
-
-            texts["title"] = filename
-            texts["filepath"] = path
-            texts["isClassified"] = "No"
-            texts['author'], texts["data"], texts["preprocessed"] = "Unknown", img_extractor(path), None
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
+            new_doc["data"], \
+            new_doc["preprocessed"] = img_extractor(path), None
             index += 1
-            mega_dic[str(index)] = texts
-            texts = {}
+            mega_dic[str(index)] = new_doc
+        else:
+            continue
 
     to_json(mega_dic)
 

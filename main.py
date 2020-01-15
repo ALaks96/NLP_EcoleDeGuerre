@@ -10,4 +10,4 @@ location = os.getcwd() + "/data/data"
 index_doc(location)
 #texts_nlp = launch_preprocessing(texts)
 #upload_to_es(texts, 'nlp', 'localhost', 9200)
-texts = extract_text(location)
+#texts = extract_text(location)

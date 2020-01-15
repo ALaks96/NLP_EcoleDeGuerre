@@ -51,7 +51,7 @@ def pdf_extractor(path):
 
         if "cid" in temp2:
             c = 0
-            c = temp2.count()
+            c = temp2.count("cid")
 
             if c > 5:
                 Classified = "Yes"
