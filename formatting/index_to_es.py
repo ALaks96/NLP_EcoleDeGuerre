@@ -10,7 +10,7 @@ def get_paths():
     with open(os.getcwd() + '/scan.json') as json_file:
         data = json.load(json_file)
     for p in data:
-        if(p['type'] == 'pdf'):
+        if(p['type'] in ['pdf', 'docx', 'doc', 'ppt', 'pptx', 'xls', 'xslx', 'pptx', 'ppt', 'txt', 'png', 'jpg', 'jpeg']):
             l.append(p['filepath'])
     return l
 
@@ -35,7 +35,7 @@ def index_doc(location, save=False):
         elif path.endswith(".docx"):
             new_doc["author"], new_doc["data"] = txt_extractor(path)
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
-            new_doc["author"], new_doc["data"] = "Image", img_extractor(path), None
+            new_doc["author"], new_doc["data"] = "Image", img_extractor(path)
         else:
             continue
 

@@ -1,6 +1,7 @@
 pdfminer
 slate3k
 hachoir
+regex
 graphviz
 unidecode
 langdetect
