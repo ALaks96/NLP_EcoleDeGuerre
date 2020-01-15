@@ -79,8 +79,8 @@ def preprocessing(text):
     # Tokenization
     tokens = word_tokenize(text)
 
-    # Deleting words with  only one caracter
-    tokens = [token for token in tokens if len(token) > 2]
+    # Deleting words with  only one character
+    tokens = [token for token in tokens if len(token) > 0]
 
     # stopwords + lowercase
     tokens = [token.lower() for token in tokens if token.lower() not in stopword_list]
