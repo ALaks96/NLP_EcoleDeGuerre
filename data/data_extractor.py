@@ -240,7 +240,7 @@ def pdf_extractor3(path):
     current_page_number = 1
     paragraph_repo = {}
     #clean_paragraph_repo = {}
-    Classified = "No"
+    Classified = False
 
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
         text = ''

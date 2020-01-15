@@ -25,7 +25,7 @@ def index_doc(location, save=False):
         print(filename)  
         new_doc["title"] = filename
         new_doc["filepath"] = path
-        new_doc["isClassified"] = "No"
+        new_doc["isClassified"] = False
         if path.endswith(".pptx") or path.endswith(".ppt"):
             new_doc["author"], new_doc["data"] = ppt_extractor(path)
         elif path.endswith(".pdf"):
@@ -43,7 +43,7 @@ def index_doc(location, save=False):
             to_json(new_doc, "index.json")
 
         # Envoi du document sur Elastic Search
-        res = es.index(index="test", body=new_doc)
+        res = es.index(index="test2", body=new_doc)
         print(res['result'] + " in ElasticSearch\n-------------------")
         new_doc = {}
 
