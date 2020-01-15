@@ -2,6 +2,7 @@ import PyPDF2
 import textract
 import os
 import zipfile
+import re
 import slate3k as slate
 from pptx import Presentation
 from hachoir.parser import createParser
@@ -244,8 +245,10 @@ def pdf_extractor3(path):
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
         interpreter.process_page(page)
+
         text = retstr.getvalue()
-        #clean_text = preprocessing(text)
+        retstr.truncate(0)
+        text = re.sub(u'(\u0000)', "", text)
         paragraph_repo[str(current_page_number)] = text
         #clean_paragraph_repo[str(current_page_number)] = clean_text
         current_page_number += 1
