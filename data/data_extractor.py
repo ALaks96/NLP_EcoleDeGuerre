@@ -182,6 +182,11 @@ def pdf_extractor2(path):
     # Create a pdf reader .
     pdf_file_reader = PyPDF2.PdfFileReader(file_object)
 
+    try:
+        creator = pdf_file_reader.getDocumentInfo()["/Author"]
+    except:
+        creator = "Unknown"
+
     # Get total pdf page number.
     total_page_number = pdf_file_reader.numPages
 
