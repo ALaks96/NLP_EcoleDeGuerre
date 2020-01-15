@@ -5,6 +5,7 @@ from data.data_extractor import pdf_extractor3
 from data.data_extractor import txt_extractor
 from data.data_extractor import docx_extractor
 from data.data_extractor import img_extractor
+from data.data_extractor import excel_extractor
 from data.data_extractor import get_arbo
 from preprocessing.pre_processing import preprocessing
 
@@ -37,32 +38,27 @@ def extract_text(location):
         new_doc['author'] = "Unknown"
         if path.endswith(".pptx") or path.endswith(".ppt"):
             new_doc['author'], \
-            new_doc["data"], \
-            new_doc["preprocessed"] = ppt_extractor(path)
+            new_doc["data"] = ppt_extractor(path)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".pdf"):
             new_doc["isClassified"], \
             new_doc["author"], \
-            new_doc["data"], \
-            new_doc["preprocessed"] = pdf_extractor3(path)
+            new_doc["data"] = pdf_extractor3(path)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".docx"):
             new_doc["author"], \
-            new_doc["data"], \
-            new_doc["preprocessed"] = docx_extractor(path)
+            new_doc["data"] = docx_extractor(path)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".docx"):
             new_doc["author"], \
-            new_doc["data"], \
-            new_doc["preprocessed"] = txt_extractor(path)
+            new_doc["data"] = txt_extractor(path)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
-            new_doc["data"], \
-            new_doc["preprocessed"] = img_extractor(path), None
+            new_doc["data"] = img_extractor(path), None
             index += 1
             mega_dic[str(index)] = new_doc
         else:
@@ -82,3 +78,54 @@ def launch_preprocessing(d):
             d[k] = preprocessing(v)
 
     return d
+
+
+def extract_text2(location):
+    paths = get_arbo(location)
+    index = 0
+    mega_dic = {}
+
+    for path in paths:
+        new_doc = {}
+        filename = os.path.basename(path)
+        print(filename)
+        new_doc["title"] = filename
+        new_doc["filepath"] = path
+        new_doc["isClassified"] = "No"
+        new_doc['author'] = "Unknown"
+        if path.endswith(".pptx") or path.endswith(".ppt"):
+            new_doc['author'], \
+            new_doc["data"] = ppt_extractor(path)
+            index += 1
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".pdf"):
+            new_doc["isClassified"], \
+            new_doc["author"], \
+            new_doc["data"] = pdf_extractor3(path)
+            index += 1
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".docx"):
+            new_doc["author"], \
+            new_doc["data"] = docx_extractor(path)
+            index += 1
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".docx"):
+            new_doc["author"], \
+            new_doc["data"] = txt_extractor(path)
+            index += 1
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
+            new_doc["data"] = img_extractor(path), None
+            index += 1
+            mega_dic[str(index)] = new_doc
+        elif path.endswith(".xls") or path.endswith(".xlsx"):
+            new_doc["author"], \
+            new_doc["data"] = excel_extractor(path)
+            index += 1
+            mega_dic[str(index)] = new_doc
+        else:
+            continue
+
+    to_json(mega_dic)
+
+    return mega_dic
