@@ -173,3 +173,39 @@ def get_arbo(location):
         paths.append(path)
 
     return paths
+
+
+def pdf_extractor2(path):
+    # Open the pdf file in read binary mode.
+    file_object = open(path, 'rb')
+
+    # Create a pdf reader .
+    pdf_file_reader = PyPDF2.PdfFileReader(file_object)
+
+    # Get total pdf page number.
+    total_page_number = pdf_file_reader.numPages
+
+    current_page_number = 1
+    paragraph_repo = {}
+    clean_paragraph_repo = {}
+    Classified = "No"
+
+    # Loop in all the pdf pages.
+    while current_page_number < total_page_number:
+        # Get the specified pdf page object.
+        pdf_page = pdf_file_reader.getPage(current_page_number)
+        text = pdf_page.extractText()
+        clean_text = preprocessing(text)
+
+        # Get pdf page text.
+        paragraph_repo[str(current_page_number)] = text
+        clean_paragraph_repo[str(current_page_number)] = clean_text
+
+        # Process next page.
+        current_page_number += 1
+
+    if not paragraph_repo:
+        # If can not extract text then use ocr lib to extract the scanned pdf file.
+        paragraph_repo[str(current_page_number)] = textract.process(path, method='tesseract', encoding='utf-8')
+
+    return Classified, creator, paragraph_repo, clean_paragraph_repo
