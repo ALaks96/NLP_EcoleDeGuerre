@@ -39,7 +39,7 @@ def pdf_extractor(path):
 
     current_page_number = 1
     paragraph_repo = {}
-    clean_paragraph_repo = {}
+    #clean_paragraph_repo = {}
     Classified = "No"
 
     # Reliably retrieve text from pdf
@@ -49,18 +49,18 @@ def pdf_extractor(path):
     for page in doc:
         # Get pdf page text.
         temp1 = None
-        temp2 = None
+        #temp2 = None
         temp1 = page
-        temp2 = preprocessing(page)
+        #temp2 = preprocessing(page)
         paragraph_repo[str(current_page_number)] = temp1
-        clean_paragraph_repo[str(current_page_number)] = temp2
+        #clean_paragraph_repo[str(current_page_number)] = temp2
 
-        if "cid" in temp2:
-            c = 0
-            c = temp2.count("cid")
-
-            if c > 5:
-                Classified = "Yes"
+        # if "cid" in temp2:
+        #     c = 0
+        #     c = temp2.count("cid")
+        #
+        #     if c > 5:
+        #         Classified = "Yes"
 
         if not paragraph_repo[str(current_page_number)]:
             # If can not extract text then use ocr lib to extract the scanned pdf file.
@@ -73,7 +73,7 @@ def pdf_extractor(path):
 
         current_page_number += 1
 
-    return Classified, creator, paragraph_repo, clean_paragraph_repo
+    return Classified, creator, paragraph_repo#, clean_paragraph_repo
 
 
 def docx_extractor(path):
@@ -92,7 +92,7 @@ def docx_extractor(path):
     tree = XML(xml_content)
 
     doc = {}
-    clean_doc = {}
+    #clean_doc = {}
     paragraph_nb = 1
     for paragraph in tree.getiterator(PARA):
         texts = None
@@ -103,16 +103,16 @@ def docx_extractor(path):
         if texts:
             text = ''.join(texts)
             doc[str(paragraph_nb)] = fix_text(text)
-            clean_doc[str(paragraph_nb)] = preprocessing(text)
+            #clean_doc[str(paragraph_nb)] = preprocessing(text)
             paragraph_nb += 1
 
-    return creator, doc, clean_doc
+    return creator, doc#, clean_doc
 
 
 def ppt_extractor(path):
     filename = os.path.basename(path)
     paragraph_repo = {}
-    clean_paragraph_repo = {}
+    #@clean_paragraph_repo = {}
     f = open(path, "rb")
     prs = Presentation(f)
     slide_nb = 0
@@ -141,14 +141,14 @@ def ppt_extractor(path):
                 temp_text += shape.text
 
         paragraph_repo[str(slide_nb)] = fix_text(temp_text)
-        clean_paragraph_repo[str(slide_nb)] = preprocessing(temp_text)
+        #clean_paragraph_repo[str(slide_nb)] = preprocessing(temp_text)
 
-    return creator, paragraph_repo, clean_paragraph_repo
+    return creator, paragraph_repo#, clean_paragraph_repo
 
 
 def txt_extractor(path):
     doc = {}
-    clean_doc = {}
+    #clean_doc = {}
     paragraph_nb = 1
 
     with open(path) as f:
@@ -157,10 +157,10 @@ def txt_extractor(path):
     texts = lines.strip().split("/n/n")
     for text in texts:
         doc[str(paragraph_nb)] = fix_text(text)
-        clean_doc[str(paragraph_nb)] = preprocessing(text)
+        #clean_doc[str(paragraph_nb)] = preprocessing(text)
         paragraph_nb += 1
 
-    return doc, clean_doc
+    return doc#, clean_doc
 
 
 def img_extractor(path):
@@ -198,7 +198,7 @@ def pdf_extractor2(path):
 
     current_page_number = 1
     paragraph_repo = {}
-    clean_paragraph_repo = {}
+    #clean_paragraph_repo = {}
     Classified = "No"
 
     # Loop in all the pdf pages.
@@ -206,11 +206,11 @@ def pdf_extractor2(path):
         # Get the specified pdf page object.
         pdf_page = pdf_file_reader.getPage(current_page_number)
         text = pdf_page.extractText()
-        clean_text = preprocessing(text)
+        #clean_text = preprocessing(text)
 
         # Get pdf page text.
         paragraph_repo[str(current_page_number)] = text
-        clean_paragraph_repo[str(current_page_number)] = clean_text
+        #clean_paragraph_repo[str(current_page_number)] = clean_text
 
         # Process next page.
         current_page_number += 1
@@ -219,7 +219,7 @@ def pdf_extractor2(path):
         # If can not extract text then use ocr lib to extract the scanned pdf file.
         paragraph_repo[str(current_page_number)] = textract.process(path, method='tesseract', encoding='utf-8')
 
-    return Classified, creator, paragraph_repo, clean_paragraph_repo
+    return Classified, creator, paragraph_repo#, clean_paragraph_repo
 
 
 def pdf_extractor3(path):
@@ -238,19 +238,19 @@ def pdf_extractor3(path):
 
     current_page_number = 1
     paragraph_repo = {}
-    clean_paragraph_repo = {}
+    #clean_paragraph_repo = {}
     Classified = "No"
 
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
         interpreter.process_page(page)
         text = retstr.getvalue()
-        clean_text = preprocessing(text)
+        #clean_text = preprocessing(text)
         paragraph_repo[str(current_page_number)] = text
-        clean_paragraph_repo[str(current_page_number)] = clean_text
+        #clean_paragraph_repo[str(current_page_number)] = clean_text
         current_page_number += 1
 
     fp.close()
     device.close()
     retstr.close()
-    return Classified, creator, paragraph_repo, clean_paragraph_repo
+    return Classified, creator, paragraph_repo#, clean_paragraph_repo
