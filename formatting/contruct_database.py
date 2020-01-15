@@ -38,23 +38,27 @@ def extract_text(location):
         new_doc['author'] = "Unknown"
         if path.endswith(".pptx") or path.endswith(".ppt"):
             new_doc['author'], \
-            new_doc["data"] = ppt_extractor(path)
+            new_doc["data"], \
+            new_doc["vectors"] = ppt_extractor(path, vectors=True)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".pdf"):
             new_doc["isClassified"], \
             new_doc["author"], \
-            new_doc["data"] = pdf_extractor3(path)
+            new_doc["data"], \
+            new_doc["vectors"] = pdf_extractor3(path, vectors=True)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".docx"):
             new_doc["author"], \
-            new_doc["data"] = docx_extractor(path)
+            new_doc["data"], \
+            new_doc["vectors"] = docx_extractor(path, vectors=True)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".docx"):
             new_doc["author"], \
-            new_doc["data"] = txt_extractor(path)
+            new_doc["data"], \
+            new_doc["vectors"] = txt_extractor(path, vectors=True)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):

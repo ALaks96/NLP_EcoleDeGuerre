@@ -4,11 +4,12 @@ import os
 import zipfile
 import re
 import slate3k as slate
+import pandas as pd
 from pptx import Presentation
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 from preprocessing.pre_processing import fix_text
-from preprocessing.pre_processing import preprocessing
+from embedders.embedding import vectorizer
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -26,7 +27,7 @@ PARA = WORD_NAMESPACE + 'p'
 TEXT = WORD_NAMESPACE + 't'
 
 
-def pdf_extractor(path):
+def pdf_extractor(path, vectors=False):
     # Open the pdf file in read binary mode.
     file_object = open(path, 'rb')
 
@@ -40,7 +41,7 @@ def pdf_extractor(path):
 
     current_page_number = 1
     paragraph_repo = {}
-    #clean_paragraph_repo = {}
+    vector = {}
     Classified = "No"
 
     # Reliably retrieve text from pdf
@@ -50,11 +51,11 @@ def pdf_extractor(path):
     for page in doc:
         # Get pdf page text.
         temp1 = None
-        #temp2 = None
+        temp2 = None
         temp1 = page
-        #temp2 = preprocessing(page)
+        temp2 = vectorizer(page)
         paragraph_repo[str(current_page_number)] = temp1
-        #clean_paragraph_repo[str(current_page_number)] = temp2
+        vector[str(current_page_number)] = temp2
 
         # if "cid" in temp2:
         #     c = 0
@@ -74,10 +75,13 @@ def pdf_extractor(path):
 
         current_page_number += 1
 
-    return Classified, creator, paragraph_repo#, clean_paragraph_repo
+    if vectors:
+        return Classified, creator, paragraph_repo, vector
+    else:
+        return Classified, creator, paragraph_repo
 
 
-def docx_extractor(path):
+def docx_extractor(path, vectors=False):
     document = zipfile.ZipFile(path)
     xml_content = document.read('word/document.xml')
     ## GET METADATA
@@ -93,7 +97,7 @@ def docx_extractor(path):
     tree = XML(xml_content)
 
     doc = {}
-    #clean_doc = {}
+    vector = {}
     paragraph_nb = 1
     for paragraph in tree.getiterator(PARA):
         texts = None
@@ -104,16 +108,19 @@ def docx_extractor(path):
         if texts:
             text = ''.join(texts)
             doc[str(paragraph_nb)] = fix_text(text)
-            #clean_doc[str(paragraph_nb)] = preprocessing(text)
+            vector[str(paragraph_nb)] = vectorizer(text)
             paragraph_nb += 1
 
-    return creator, doc#, clean_doc
+    if vectors:
+        return creator, doc, vector
+    else:
+        return creator, doc
 
 
-def ppt_extractor(path):
+def ppt_extractor(path, vectors=False):
     filename = os.path.basename(path)
     paragraph_repo = {}
-    #@clean_paragraph_repo = {}
+    vector = {}
     f = open(path, "rb")
     prs = Presentation(f)
     slide_nb = 0
@@ -142,14 +149,17 @@ def ppt_extractor(path):
                 temp_text += shape.text
 
         paragraph_repo[str(slide_nb)] = fix_text(temp_text)
-        #clean_paragraph_repo[str(slide_nb)] = preprocessing(temp_text)
+        vector[str(slide_nb)] = vectorizer(temp_text)
 
-    return creator, paragraph_repo#, clean_paragraph_repo
+    if vectors:
+        return creator, paragraph_repo, vector
+    else:
+        return creator, paragraph_repo
 
 
-def txt_extractor(path):
+def txt_extractor(path, vectors=False):
     doc = {}
-    #clean_doc = {}
+    vector = {}
     paragraph_nb = 1
 
     with open(path) as f:
@@ -158,10 +168,13 @@ def txt_extractor(path):
     texts = lines.strip().split("/n/n")
     for text in texts:
         doc[str(paragraph_nb)] = fix_text(text)
-        #clean_doc[str(paragraph_nb)] = preprocessing(text)
+        vector[str(paragraph_nb)] = vectorizer(text)
         paragraph_nb += 1
 
-    return doc#, clean_doc
+    if vectors:
+        return doc, vector
+    else:
+        return doc
 
 
 def img_extractor(path):
@@ -182,7 +195,7 @@ def get_arbo(location):
     return paths
 
 
-def pdf_extractor2(path):
+def pdf_extractor2(path, vectors=False):
     # Open the pdf file in read binary mode.
     file_object = open(path, 'rb')
 
@@ -199,7 +212,7 @@ def pdf_extractor2(path):
 
     current_page_number = 1
     paragraph_repo = {}
-    #clean_paragraph_repo = {}
+    vector = {}
     Classified = "No"
 
     # Loop in all the pdf pages.
@@ -207,11 +220,10 @@ def pdf_extractor2(path):
         # Get the specified pdf page object.
         pdf_page = pdf_file_reader.getPage(current_page_number)
         text = pdf_page.extractText()
-        #clean_text = preprocessing(text)
 
         # Get pdf page text.
         paragraph_repo[str(current_page_number)] = text
-        #clean_paragraph_repo[str(current_page_number)] = clean_text
+        vector[str(current_page_number)] = vectorizer(text)
 
         # Process next page.
         current_page_number += 1
@@ -220,13 +232,15 @@ def pdf_extractor2(path):
         # If can not extract text then use ocr lib to extract the scanned pdf file.
         paragraph_repo[str(current_page_number)] = textract.process(path, method='tesseract', encoding='utf-8')
 
-    return Classified, creator, paragraph_repo#, clean_paragraph_repo
+    if vectors:
+        return Classified, creator, paragraph_repo, vector
+    else:
+        return Classified, creator, paragraph_repo
 
 
-def pdf_extractor3(path):
+def pdf_extractor3(path, vectors=False):
     rsrcmgr = PDFResourceManager()
     retstr = StringIO()
-    codec = 'utf-8'
     laparams = LAParams()
     device = TextConverter(rsrcmgr, retstr, laparams=laparams)
     fp = open(path, 'rb')
@@ -239,7 +253,7 @@ def pdf_extractor3(path):
 
     current_page_number = 1
     paragraph_repo = {}
-    #clean_paragraph_repo = {}
+    vector = {}
     Classified = False
 
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
@@ -250,10 +264,36 @@ def pdf_extractor3(path):
         retstr.truncate(0)
         text = re.sub(u'(\u0000)', "", text)
         paragraph_repo[str(current_page_number)] = text
-        #clean_paragraph_repo[str(current_page_number)] = clean_text
+        vector[str(current_page_number)] = vectorizer(text)
         current_page_number += 1
 
     fp.close()
     device.close()
     retstr.close()
-    return Classified, creator, paragraph_repo#, clean_paragraph_repo
+    if vectors:
+        return Classified, creator, paragraph_repo, vector
+    else:
+        return Classified, creator, paragraph_repo
+
+
+def excel_extractor(path):
+    OrderedDic = pd.read_excel(path, sheet_name=None)
+    Dic = dict(OrderedDic)
+    for k, v in Dic.items():
+        Dic[k] = v.dropna().to_string()
+    filename = os.path.basename(path)
+    if filename.endswith(".xlsx"):
+        try:
+            document = zipfile.ZipFile(path)
+            ## GET METADATA
+            # use lxml to parse the xml file we are interested in
+            doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
+            # retrieve creator
+            ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
+            creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+        except:
+            creator = "Unknown"
+    else:
+        creator = "Unknown"
+
+    return creator, Dic
