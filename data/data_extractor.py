@@ -8,7 +8,13 @@ from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 from preprocessing.pre_processing import fix_text
 from preprocessing.pre_processing import preprocessing
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfpage import PDFPage
+from io import StringIO
 import lxml.etree
+
 try:
     from xml.etree.cElementTree import XML
 except ImportError:
@@ -60,8 +66,8 @@ def pdf_extractor(path):
             # If can not extract text then use ocr lib to extract the scanned pdf file.
             try:
                 paragraph_repo[str(current_page_number)] = fix_text(textract.process(path,
-                                                                             method='tesseract',
-                                                                             encoding='utf-8'))
+                                                                                     method='tesseract',
+                                                                                     encoding='utf-8'))
             except TimeoutError:
                 continue
 
@@ -77,7 +83,7 @@ def docx_extractor(path):
     # use lxml to parse the xml file we are interested in
     try:
         doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
-    # retrieve creator
+        # retrieve creator
         ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
         creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
     except:
@@ -113,10 +119,10 @@ def ppt_extractor(path):
     if filename.endswith(".pptx"):
         try:
             document = zipfile.ZipFile(path)
-        ## GET METADATA
-        # use lxml to parse the xml file we are interested in
+            ## GET METADATA
+            # use lxml to parse the xml file we are interested in
             doc = lxml.etree.fromstring(document.read('docProps/core.xml'))
-        # retrieve creator
+            # retrieve creator
             ns = {'dc': 'http://purl.org/dc/elements/1.1/'}
             creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
         except:
@@ -213,4 +219,38 @@ def pdf_extractor2(path):
         # If can not extract text then use ocr lib to extract the scanned pdf file.
         paragraph_repo[str(current_page_number)] = textract.process(path, method='tesseract', encoding='utf-8')
 
+    return Classified, creator, paragraph_repo, clean_paragraph_repo
+
+
+def pdf_extractor3(path):
+    rsrcmgr = PDFResourceManager()
+    retstr = StringIO()
+    codec = 'utf-8'
+    laparams = LAParams()
+    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+    fp = open(path, 'rb')
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    password = ""
+    maxpages = 0
+    caching = True
+    pagenos = set()
+    creator = "Unknown"
+
+    current_page_number = 1
+    paragraph_repo = {}
+    clean_paragraph_repo = {}
+    Classified = "No"
+
+    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
+                                  check_extractable=True):
+        interpreter.process_page(page)
+        text = retstr.getvalue()
+        clean_text = preprocessing(text)
+        paragraph_repo[str(current_page_number)] = text
+        clean_paragraph_repo[str(current_page_number)] = clean_text
+        current_page_number += 1
+
+    fp.close()
+    device.close()
+    retstr.close()
     return Classified, creator, paragraph_repo, clean_paragraph_repo

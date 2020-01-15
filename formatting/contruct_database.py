@@ -1,7 +1,7 @@
 import json
 import os
 from data.data_extractor import ppt_extractor
-from data.data_extractor import pdf_extractor
+from data.data_extractor import pdf_extractor3
 from data.data_extractor import txt_extractor
 from data.data_extractor import docx_extractor
 from data.data_extractor import img_extractor
@@ -45,7 +45,7 @@ def extract_text(location):
             new_doc["isClassified"], \
             new_doc["author"], \
             new_doc["data"], \
-            new_doc["preprocessed"] = pdf_extractor(path)
+            new_doc["preprocessed"] = pdf_extractor3(path)
             index += 1
             mega_dic[str(index)] = new_doc
         elif path.endswith(".docx"):

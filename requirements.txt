@@ -1,3 +1,4 @@
+pdfminer
 slate3k
 hachoir
 graphviz
