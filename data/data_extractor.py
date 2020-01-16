@@ -5,17 +5,18 @@ import zipfile
 import re
 import slate3k as slate
 import pandas as pd
+import lxml.etree
 from pptx import Presentation
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 from preprocessing.pre_processing import fix_text
-from embedders.embedding import vectorizer
+from embedders.word2vec import vectorizer
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
-import lxml.etree
+from langdetect import detect
 
 try:
     from xml.etree.cElementTree import XML
@@ -53,7 +54,7 @@ def pdf_extractor(path, vectors=False):
         temp1 = None
         temp2 = None
         temp1 = page
-        temp2 = vectorizer(page)
+        temp2 = vectorizer(page, lang=detect(page))
         paragraph_repo[str(current_page_number)] = temp1
         vector[str(current_page_number)] = temp2
 
@@ -108,7 +109,7 @@ def docx_extractor(path, vectors=False):
         if texts:
             text = ''.join(texts)
             doc[str(paragraph_nb)] = fix_text(text)
-            vector[str(paragraph_nb)] = vectorizer(text)
+            vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
             paragraph_nb += 1
 
     if vectors:
@@ -149,7 +150,7 @@ def ppt_extractor(path, vectors=False):
                 temp_text += shape.text
 
         paragraph_repo[str(slide_nb)] = fix_text(temp_text)
-        vector[str(slide_nb)] = vectorizer(temp_text)
+        vector[str(slide_nb)] = vectorizer(temp_text, lang=detect(text))
 
     if vectors:
         return creator, paragraph_repo, vector
@@ -168,7 +169,7 @@ def txt_extractor(path, vectors=False):
     texts = lines.strip().split("/n/n")
     for text in texts:
         doc[str(paragraph_nb)] = fix_text(text)
-        vector[str(paragraph_nb)] = vectorizer(text)
+        vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
         paragraph_nb += 1
 
     if vectors:
@@ -223,7 +224,7 @@ def pdf_extractor2(path, vectors=False):
 
         # Get pdf page text.
         paragraph_repo[str(current_page_number)] = text
-        vector[str(current_page_number)] = vectorizer(text)
+        vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
 
         # Process next page.
         current_page_number += 1
@@ -264,7 +265,7 @@ def pdf_extractor3(path, vectors=False):
         retstr.truncate(0)
         text = re.sub(u'(\u0000)', "", text)
         paragraph_repo[str(current_page_number)] = text
-        vector[str(current_page_number)] = vectorizer(text)
+        vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
         current_page_number += 1
 
     fp.close()

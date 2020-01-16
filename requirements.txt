@@ -1,3 +1,4 @@
+fasttext
 gensim
 pdfminer
 slate3k

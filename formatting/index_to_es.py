@@ -27,17 +27,35 @@ def index_doc(location, save=False):
         new_doc["filepath"] = path
         new_doc["isClassified"] = False
         if path.endswith(".pptx") or path.endswith(".ppt"):
-            new_doc["author"], new_doc["data"] = ppt_extractor(path)
+            try:
+                new_doc["author"], new_doc["data"] = ppt_extractor(path)
+            except:
+                pass
         elif path.endswith(".pdf"):
-            new_doc["isClassified"], new_doc["author"], new_doc["data"] = pdf_extractor3(path)
+            try:
+                new_doc["isClassified"], new_doc["author"], new_doc["data"] = pdf_extractor3(path)
+            except:
+                pass
         elif path.endswith(".docx"):
-            new_doc["author"], new_doc["data"] = docx_extractor(path)
+            try:
+                new_doc["author"], new_doc["data"] = docx_extractor(path)
+            except:
+                pass
         elif path.endswith(".txt"):
-            new_doc["author"], new_doc["data"] = txt_extractor(path)
+            try:
+                new_doc["author"], new_doc["data"] = txt_extractor(path)
+            except:
+                pass
         elif path.endswith(".xls") or path.endswith("xlsx"):
-            new_doc["author"], new_doc["data"] = excel_extractor(path)
+            try:
+                new_doc["author"], new_doc["data"] = excel_extractor(path)
+            except:
+                pass
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
-            new_doc["author"], new_doc["data"] = "Image", img_extractor(path)
+            try:
+                new_doc["author"], new_doc["data"] = "Image", img_extractor(path)
+            except:
+                pass
         else:
             continue
 

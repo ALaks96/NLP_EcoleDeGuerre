@@ -1,21 +1,32 @@
 import os
+import fasttext.util
+import numpy as np
 from gensim.models import KeyedVectors
 from preprocessing.pre_processing import preprocessing
-import numpy as np
-path_to_w2v = os.getcwd() + "/data/data/"
-print("getting google word2vec")
-w2v = KeyedVectors.load_word2vec_format(path_to_w2v + 'GoogleNews-vectors-negative300.bin', binary=True)
+
+path_to_w2v_en = os.getcwd() + "/data/data/GoogleNews-vectors-negative300.bin"
+path_to_w2v_fr = os.getcwd() + "/data/data/cc.co.300.bin"
+
+print("getting french google word2vec")
+w2v_fr = fasttext.load_model(path_to_w2v_fr)
+print("done")
+
+print("getting english google word2vec")
+w2v_en = KeyedVectors.load_word2vec_format(path_to_w2v_en, binary=True)
 print("done")
 
 
-def vectorizer(text):
+def vectorizer(text, lang="en"):
     """Identify the vector values for each word in the given document"""
     text = preprocessing(text)
     word_vecs = []
     words = text.split(" ")
     for word in words:
         try:
-            vec = w2v[word]
+            if lang == 'en':
+                vec = w2v_en[word]
+            else:
+                vec = w2v_fr[word]
             word_vecs.append(vec)
         except KeyError:
             # Ignore if the word doesn't exist in the vocabulary
