@@ -10,13 +10,13 @@ from pptx import Presentation
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 from preprocessing.pre_processing import fix_text
-from embedders.word2vec import vectorizer
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from io import StringIO
 from langdetect import detect
+#from embedders.word2vec import vectorizer
 
 try:
     from xml.etree.cElementTree import XML
