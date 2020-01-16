@@ -281,7 +281,10 @@ def excel_extractor(path):
     OrderedDic = pd.read_excel(path, sheet_name=None)
     Dic = dict(OrderedDic)
     for k, v in Dic.items():
-        Dic[k] = v.dropna().to_string()
+        if v:
+            Dic[k] = v.dropna().to_string()
+        else:
+            pass
     filename = os.path.basename(path)
     if filename.endswith(".xlsx"):
         try:
