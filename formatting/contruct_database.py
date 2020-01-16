@@ -34,7 +34,7 @@ def extract_text(location):
         print(filename)
         new_doc["title"] = filename
         new_doc["filepath"] = path
-        new_doc["isClassified"] = "No"
+        new_doc["isClassified"] = False
         new_doc['author'] = "Unknown"
         if path.endswith(".pptx") or path.endswith(".ppt"):
             try:
@@ -64,7 +64,7 @@ def extract_text(location):
                 mega_dic[str(index)] = new_doc
             except:
                 pass
-        elif path.endswith(".docx"):
+        elif path.endswith(".txt"):
             try:
                 new_doc["author"], \
                 new_doc["data"], \
@@ -75,7 +75,17 @@ def extract_text(location):
                 pass
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
             try:
-                new_doc["data"] = img_extractor(path), None
+                new_doc["data"], \
+                new_doc["vectors"] = img_extractor(path), None
+                index += 1
+                mega_dic[str(index)] = new_doc
+            except:
+                pass
+        elif path.endswith(".xls") or path.endswith(".xlsx"):
+            try:
+                new_doc["author"], \
+                new_doc["data"], \
+                new_doc["vectors"] = excel_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
             except:
@@ -110,7 +120,7 @@ def extract_text2(location):
         print(filename)
         new_doc["title"] = filename
         new_doc["filepath"] = path
-        new_doc["isClassified"] = "No"
+        new_doc["isClassified"] = False
         new_doc['author'] = "Unknown"
         if path.endswith(".pptx") or path.endswith(".ppt"):
             try:
@@ -147,7 +157,7 @@ def extract_text2(location):
                 pass
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
             try:
-                new_doc["data"] = img_extractor(path), None
+                new_doc["data"] = img_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
             except:
