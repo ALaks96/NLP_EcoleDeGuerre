@@ -88,7 +88,6 @@ def extract_text(location):
                 pass
         elif path.endswith(".xls") or path.endswith(".xlsx"):
             try:
-                new_doc["author"], \
                 new_doc["data"], \
                 new_doc["vectors"] = excel_extractor(path)
                 index += 1

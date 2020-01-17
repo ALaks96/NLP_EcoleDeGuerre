@@ -7,10 +7,10 @@ es = Elasticsearch()
 
 def get_paths():
     l = []
-    with open(os.getcwd() + '/scan.json') as json_file:
+    with open(os.getcwd() + '/scan.ndjson') as json_file:
         data = json.load(json_file)
     for p in data:
-        if(p['type'] in ['pdf', 'docx', 'doc', 'ppt', 'pptx', 'xls', 'xslx', 'pptx', 'ppt', 'txt', 'png', 'jpg', 'jpeg']):
+        if(p['type'] in ['docx', 'doc', 'ppt', 'pptx', 'xslx', 'pptx', 'ppt', 'txt', 'png', 'jpg', 'jpeg']):
             l.append(p['filepath'])
     return l
 
