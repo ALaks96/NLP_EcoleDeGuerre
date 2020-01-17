@@ -1,22 +1,24 @@
-import PyPDF2
-import textract
 import os
-import zipfile
 import re
-import slate3k as slate
-import pandas as pd
+import zipfile
+from io import StringIO
+import PyPDF2
 import lxml.etree
-from pptx import Presentation
-from hachoir.parser import createParser
+import pandas as pd
+import slate3k as slate
+import textract
 from hachoir.metadata import extractMetadata
-from preprocessing.pre_processing import fix_text
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from hachoir.parser import createParser
+from langdetect import detect
+from pdf2image import convert_from_path
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
-from io import StringIO
-from langdetect import detect
-#from embedders.word2vec import vectorizer
+from pptx import Presentation
+from pytesseract import image_to_string
+from embedders.word2vec import vectorizer
+from preprocessing.pre_processing import fix_text
 
 try:
     from xml.etree.cElementTree import XML
@@ -301,3 +303,24 @@ def excel_extractor(path):
         creator = "Unknown"
 
     return creator, Dic
+
+
+def scan_extractor(path, vectors=False):
+    pages = convert_from_path(path, 500)
+    paragraph_repo = {}
+    vector = {}
+    current_page_number = 1
+
+    for page in pages:
+        text = ''
+        text = image_to_string(page)
+        paragraph_repo[str(current_page_number)] = text
+
+        if vectors:
+            vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
+
+    if vectors:
+        return paragraph_repo, vector
+
+    else:
+        return paragraph_repo

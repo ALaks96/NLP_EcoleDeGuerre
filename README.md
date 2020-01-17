@@ -14,3 +14,25 @@ The third layer has a single key either referencing the page nb, paragraph nb or
 **Then to launch the code in your current directory, save your file in the nested folder /data/data/** (this format is convenient for the project but unconvenient for other purposes, is bound to change) **and launch with the following command in your terminal:**
 
 `python3 main.py`
+
+You also need to install tesseract on your machine
+
+**On Linux**
+
+`sudo apt-get update`
+`sudo apt-get install tesseract-ocr`
+`sudo apt-get install libtesseract-dev`
+
+**On Mac**
+
+`brew install tesseract`
+
+**On Windows**
+
+download binary from https://github.com/UB-Mannheim/tesseract/wiki. 
+
+*Then add to your script:*
+
+pytesseract.pytesseract.tesseract_cmd = 'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe' 
+
+

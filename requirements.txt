@@ -1,3 +1,5 @@
+pdf2image
+pytesseract
 fasttext
 gensim
 pdfminer

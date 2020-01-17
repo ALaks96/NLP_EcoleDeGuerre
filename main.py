@@ -3,7 +3,7 @@ import sys
 from formatting.contruct_database import extract_text2, extract_text
 from visualization.tree_graph import render_tree
 from formatting.index_to_es import index_doc
-#from connectdb import upload_to_es
+# from connectdb import upload_to_es
 
 
 location = os.getcwd() + "/data/data"
@@ -19,6 +19,5 @@ if vectors:
 else:
     index_doc(location, save=True)
 
-#index_doc(location, save=True)
-#render_tree(location)
-#texts = extract_text2(location)
+# index_doc(location, save=True)
+# render_tree(location)

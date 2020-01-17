@@ -6,6 +6,7 @@ from data.data_extractor import txt_extractor
 from data.data_extractor import docx_extractor
 from data.data_extractor import img_extractor
 from data.data_extractor import excel_extractor
+from data.data_extractor import scan_extractor
 from data.data_extractor import get_arbo
 from preprocessing.pre_processing import preprocessing
 
@@ -54,7 +55,11 @@ def extract_text(location):
                 index += 1
                 mega_dic[str(index)] = new_doc
             except:
-                pass
+                try:
+                    new_doc["data"], \
+                    new_doc["vectors"] = scan_extractor(path, vectors=True)
+                except:
+                    pass
         elif path.endswith(".docx"):
             try:
                 new_doc["author"], \
