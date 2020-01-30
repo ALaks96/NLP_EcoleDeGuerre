@@ -132,7 +132,8 @@ def extract_text2(location):
                 new_doc["data"] = ppt_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
-            except:
+            except Exception as e:
+                print(e)
                 pass
         elif path.endswith(".pdf"):
             try:
@@ -141,7 +142,8 @@ def extract_text2(location):
                 new_doc["data"] = pdf_extractor3(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
-            except:
+            except Exception as e:
+                print(e)
                 pass
         elif path.endswith(".docx"):
             try:
@@ -149,7 +151,8 @@ def extract_text2(location):
                 new_doc["data"] = docx_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
-            except:
+            except Exception as e:
+                print(e)
                 pass
         elif path.endswith(".docx"):
             try:
@@ -157,14 +160,16 @@ def extract_text2(location):
                 new_doc["data"] = txt_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
-            except:
+            except Exception as e:
+                print(e)
                 pass
         elif path.endswith(".png") or path.endswith(".jpg") or path.endswith(".jpeg"):
             try:
                 new_doc["data"] = img_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
-            except:
+            except Exception as e:
+                print(e)
                 pass
         elif path.endswith(".xls") or path.endswith(".xlsx"):
             try:
@@ -172,7 +177,8 @@ def extract_text2(location):
                 new_doc["data"] = excel_extractor(path)
                 index += 1
                 mega_dic[str(index)] = new_doc
-            except:
+            except Exception as e:
+                print(e)
                 pass
         else:
             continue

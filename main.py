@@ -15,7 +15,7 @@ except IndexError:
 
 if vectors:
     print("Also fetching vector representations, re-arrange code and uncomment embedding import")
-    texts = extract_text(location)
+    texts = extract_text2(location)
 else:
     index_doc(location, save=True)
 
