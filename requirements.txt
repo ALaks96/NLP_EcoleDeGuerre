@@ -24,7 +24,7 @@ IMAPClient==2.1.0
 joblib==0.14.1
 lxml==4.4.2
 nltk==3.4.5
-numpy==1.18.1
+numpy==1.22.0
 olefile==0.46
 pandas==0.25.3
 pdfminer.six==20181108
